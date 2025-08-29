@@ -1,0 +1,20 @@
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
+namespace Trazert_API.Models;
+
+[PrimaryKey(nameof(Id))]
+public class Pedido
+{
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Column(Order = 1)]
+    [JsonPropertyName("id")]
+    public int Id { get; set; }
+
+    [JsonPropertyName("pedido")]
+    public int PedidoNro { get; set; }
+
+    [JsonPropertyName("cliente")]
+    public required string Cliente { get; set; }
+}
