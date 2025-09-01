@@ -44,14 +44,16 @@ public class PostEndpoint : IEndpoint
                         new SqlParameter("@agregar", req.Agregar),
                         new SqlParameter("@pedido", req.Pedido),
                         new SqlParameter("@codbar", req.Codbar),
-                        new SqlParameter("@puesto", 1),
+                        new SqlParameter("@puesto", 17),
                         new SqlParameter("@usuario", user.FindFirst("Sub")?.Value ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value)
                     );
                 }
                 catch (SqlException ex)
                 {
-                    Console.WriteLine("SQL Error: " + ex.Message);
+                    return Results.Ok(new { message = ex.Message });
                 }
+
+                return Results.Ok();
             })
             .WithName("ActualizarExpedicion")
             .WithOpenApi()

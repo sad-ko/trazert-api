@@ -17,7 +17,7 @@ public class Usuario
     public required string Nombre { get; set; }
 
     [JsonPropertyName("fecha_baja")]
-    public DateTime FechaBaja { get; set; }
+    public DateTime? FechaBaja { get; set; }
 
     [Column(TypeName = "char")]
     [MaxLength(24)]
