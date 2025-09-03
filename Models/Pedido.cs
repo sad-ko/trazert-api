@@ -10,11 +10,14 @@ public class Pedido
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Column(Order = 1)]
     [JsonPropertyName("id")]
-    public int Id { get; set; }
+    public Int32 Id { get; set; }
 
     [JsonPropertyName("pedido")]
-    public int PedidoNro { get; set; }
+    public Int64 PedidoNro { get; set; }
 
     [JsonPropertyName("cliente")]
     public required string Cliente { get; set; }
+
+    [JsonIgnore]
+    public string? IdCtaAuxi { get; set; }
 }

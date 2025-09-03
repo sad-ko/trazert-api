@@ -35,12 +35,12 @@ public class PostEndpoint : IEndpoint
             .WithName("Login")
             .WithOpenApi();
 
-        app.MapPost("/ActualizarExpedicion", async (ClaimsPrincipal user, DatabaseContext context, [FromBody] ActualizarExpedicion req) =>
+        app.MapPost("/ActualizarExpedicionPorPedido", async (ClaimsPrincipal user, DatabaseContext context, [FromBody] ActualizarExpedicionPorPedido req) =>
             {
                 try
                 {
                     await context.Database.ExecuteSqlRawAsync(
-                        "EXEC [dbo].[ActualizarExpedicion] @agregar, @pedido, @codbar, @puesto, @usuario",
+                        "EXEC [dbo].[ActualizarExpedicionPorPedido] @agregar, @pedido, @codbar, @puesto, @usuario",
                         new SqlParameter("@agregar", req.Agregar),
                         new SqlParameter("@pedido", req.Pedido),
                         new SqlParameter("@codbar", req.Codbar),
@@ -55,7 +55,7 @@ public class PostEndpoint : IEndpoint
 
                 return Results.Ok();
             })
-            .WithName("ActualizarExpedicion")
+            .WithName("ActualizarExpedicionPorPedido")
             .WithOpenApi()
             .RequireAuthorization();
     }

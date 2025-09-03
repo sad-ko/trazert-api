@@ -37,6 +37,13 @@ public class GetEndpoints : IEndpoint
             .WithName("PedidosDetalle")
             .WithOpenApi();
 
+        app.MapGet("/Clientes", async (DatabaseContext context) =>
+            {
+                return await context.Clientes.ToArrayAsync();
+            })
+            .WithName("Clientes")
+            .WithOpenApi();
+
         app.MapGet("/Test", (ClaimsPrincipal user) =>
             {
                 return Results.Ok(new { message = $"Hola {user.Identity?.Name}" });
