@@ -9,6 +9,14 @@ public class GetEndpoints : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
+        app.MapGet("/Test", (ClaimsPrincipal user) =>
+            {
+                return Results.Ok(new { message = $"Hola {user.Identity?.Name}" });
+            })
+            .RequireAuthorization()
+            .WithName("Test")
+            .WithOpenApi();
+
         app.MapGet("/Hash", async (PasswordHasher hasher, string password) =>
             {
                 return hasher.Hash(password);
@@ -30,13 +38,6 @@ public class GetEndpoints : IEndpoint
             .WithName("Pedidos")
             .WithOpenApi();
 
-        app.MapGet("/PedidosDetalle", async (DatabaseContext context, int id) =>
-            {
-                return await context.PedidosDetalles.Where(p => p.PedidoId == id).ToArrayAsync();
-            })
-            .WithName("PedidosDetalle")
-            .WithOpenApi();
-
         app.MapGet("/Clientes", async (DatabaseContext context) =>
             {
                 return await context.Clientes.ToArrayAsync();
@@ -44,12 +45,25 @@ public class GetEndpoints : IEndpoint
             .WithName("Clientes")
             .WithOpenApi();
 
-        app.MapGet("/Test", (ClaimsPrincipal user) =>
+        app.MapGet("/PedidosDetalle", async (DatabaseContext context, int id) =>
             {
-                return Results.Ok(new { message = $"Hola {user.Identity?.Name}" });
+                return await context.PedidosDetalles.Where(p => p.PedidoId == id).ToArrayAsync();
             })
-            .RequireAuthorization()
-            .WithName("Test")
+            .WithName("PedidosDetalle")
+            .WithOpenApi();
+
+        app.MapGet("/CargaDetalle", async (DatabaseContext context, int id) =>
+            {
+                return await context.CargaDetalles.Where(c => c.ExpedicionId == id).ToArrayAsync();
+            })
+            .WithName("CargaDetalle")
+            .WithOpenApi();
+
+        app.MapGet("/DespachosDisponibles", async (DatabaseContext context) =>
+            {
+                return await context.DespachosDisponibles.ToArrayAsync();
+            })
+            .WithName("DespachosDisponibles")
             .WithOpenApi();
     }
 }

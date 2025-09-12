@@ -8,7 +8,9 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbCont
     public DbSet<Usuario> UsuariosActivos { get; set; }
     public DbSet<Pedido> Pedidos { get; set; }
     public DbSet<PedidoDetalles> PedidosDetalles { get; set; }
+    public DbSet<CargaDetalles> CargaDetalles { get; set; }
     public DbSet<Cliente> Clientes { get; set; }
+    public DbSet<Despacho> DespachosDisponibles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -21,10 +23,19 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbCont
         {
             eb.ToView("PedidosParaCargar");
         });
+        modelBuilder.Entity<Despacho>(eb =>
+        {
+            eb.ToView("DespachosDisponibles");
+        });
         modelBuilder.Entity<PedidoDetalles>(eb =>
         {
             eb.HasNoKey();
             eb.ToView("PedidosDetalles");
+        });
+        modelBuilder.Entity<CargaDetalles>(eb =>
+        {
+            eb.HasNoKey();
+            eb.ToView("CargaDetalles");
         });
         modelBuilder.Entity<Cliente>(eb =>
         {

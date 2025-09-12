@@ -39,23 +39,64 @@ public class PostEndpoint : IEndpoint
             {
                 try
                 {
+                    var idOut = new SqlParameter
+                    {
+                        ParameterName = "@id",
+                        SqlDbType = System.Data.SqlDbType.Int,
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+
                     await context.Database.ExecuteSqlRawAsync(
-                        "EXEC [dbo].[ActualizarExpedicionPorPedido] @agregar, @pedido, @codbar, @puesto, @usuario",
+                        "EXEC [dbo].[ActualizarExpedicionPorPedido] @agregar, @pedido, @codbar, @puesto, @usuario, @id OUT",
                         new SqlParameter("@agregar", req.Agregar),
                         new SqlParameter("@pedido", req.Pedido),
                         new SqlParameter("@codbar", req.Codbar),
                         new SqlParameter("@puesto", 17),
-                        new SqlParameter("@usuario", user.FindFirst("Sub")?.Value ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value)
+                        new SqlParameter("@usuario", user.FindFirst("Sub")?.Value ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value),
+                        idOut
                     );
+
+                    return Results.Ok(new { id = (int)idOut.Value });
                 }
                 catch (SqlException ex)
                 {
                     return Results.Ok(new { message = ex.Message });
                 }
-
-                return Results.Ok();
             })
             .WithName("ActualizarExpedicionPorPedido")
+            .WithOpenApi()
+            .RequireAuthorization();
+
+        app.MapPost("/ActualizarExpedicionSinPedido", async (ClaimsPrincipal user, DatabaseContext context, [FromBody] ActualizarExpedicionSinPedido req) =>
+            {
+                try
+                {
+                    var idOut = new SqlParameter
+                    {
+                        ParameterName = "@id",
+                        SqlDbType = System.Data.SqlDbType.Int,
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+
+                    await context.Database.ExecuteSqlRawAsync(
+                        "EXEC [dbo].[ActualizarExpedicionSinPedido] @agregar, @expedicion_id, @idCtaAuxi, @codbar, @puesto, @usuario, @id OUT",
+                        new SqlParameter("@agregar", req.Agregar),
+                        new SqlParameter("@expedicion_id", req.Expedicion ?? (object)DBNull.Value),
+                        new SqlParameter("@idCtaAuxi", req.CtaAuxi),
+                        new SqlParameter("@codbar", req.Codbar),
+                        new SqlParameter("@puesto", 17),
+                        new SqlParameter("@usuario", user.FindFirst("Sub")?.Value ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value),
+                        idOut
+                    );
+
+                    return Results.Ok(new { id = (int)idOut.Value });
+                }
+                catch (SqlException ex)
+                {
+                    return Results.Ok(new { message = ex.Message });
+                }
+            })
+            .WithName("ActualizarExpedicionSinPedido")
             .WithOpenApi()
             .RequireAuthorization();
     }
