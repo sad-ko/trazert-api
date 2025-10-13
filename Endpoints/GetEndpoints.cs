@@ -17,7 +17,7 @@ public class GetEndpoints : IEndpoint
             .WithName("Test")
             .WithOpenApi();
 
-        app.MapGet("/Hash", async (PasswordHasher hasher, string password) =>
+        app.MapGet("/Hash", (PasswordHasher hasher, string password) =>
             {
                 return hasher.Hash(password);
             })

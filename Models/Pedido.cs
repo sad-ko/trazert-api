@@ -7,7 +7,7 @@ namespace Trazert_API.Models;
 [PrimaryKey(nameof(Id))]
 public class Pedido
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     [Column(Order = 1)]
     [JsonPropertyName("id")]
     public Int32 Id { get; set; }

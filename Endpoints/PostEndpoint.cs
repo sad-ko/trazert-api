@@ -60,7 +60,7 @@ public class PostEndpoint : IEndpoint
                 }
                 catch (SqlException ex)
                 {
-                    return Results.Ok(new { message = ex.Message });
+                    return Results.Conflict(new { message = ex.Message });
                 }
             })
             .WithName("ActualizarExpedicionPorPedido")
@@ -93,7 +93,7 @@ public class PostEndpoint : IEndpoint
                 }
                 catch (SqlException ex)
                 {
-                    return Results.Ok(new { message = ex.Message });
+                    return Results.Conflict(new { message = ex.Message });
                 }
             })
             .WithName("ActualizarExpedicionSinPedido")
