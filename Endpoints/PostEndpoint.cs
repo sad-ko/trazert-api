@@ -3,8 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Trazert_API.Database;
-using Trazert_API.Models.Body;
-using Trazert_API.Services;
+using Trazert_API.Models.DTOs;
 
 namespace Trazert_API.Endpoints;
 
@@ -12,30 +11,7 @@ public class PostEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/Login", async (HttpContext http, DatabaseContext context, PasswordHasher hasher, TokenProvider provider, [FromBody] LoginRequest request) =>
-            {
-                var user = await context.UsuariosActivos.FirstAsync(u => u.Nombre == request.Nombre);
-
-                if (user is null || !hasher.Verify(request.Password, user.Hash))
-                {
-                    return Results.Unauthorized();
-                }
-
-                var jwt = provider.Create(user).Result;
-                http.Response.Cookies.Append("trazert_jwt", jwt, new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.None,
-                    Expires = DateTime.UtcNow.AddHours(1)
-                });
-
-                return Results.Ok(new { message = "Logged in!" });
-            })
-            .WithName("Login")
-            .WithOpenApi();
-
-        app.MapPost("/ActualizarExpedicionPorPedido", async (ClaimsPrincipal user, DatabaseContext context, [FromBody] ActualizarExpedicionPorPedido req) =>
+        app.MapPost("/actualizar_expedicion_pedido", async (ClaimsPrincipal user, DatabaseContext context, [FromBody] ActualizarExpedicionPorPedido req) =>
             {
                 try
                 {
@@ -63,11 +39,10 @@ public class PostEndpoint : IEndpoint
                     return Results.Conflict(new { message = ex.Message });
                 }
             })
-            .WithName("ActualizarExpedicionPorPedido")
-            .WithOpenApi()
+            .WithName("Actualizar Expedicion por Pedido")
             .RequireAuthorization();
 
-        app.MapPost("/ActualizarExpedicionSinPedido", async (ClaimsPrincipal user, DatabaseContext context, [FromBody] ActualizarExpedicionSinPedido req) =>
+        app.MapPost("/actualizar_expedicion", async (ClaimsPrincipal user, DatabaseContext context, [FromBody] ActualizarExpedicionSinPedido req) =>
             {
                 try
                 {
@@ -96,8 +71,7 @@ public class PostEndpoint : IEndpoint
                     return Results.Conflict(new { message = ex.Message });
                 }
             })
-            .WithName("ActualizarExpedicionSinPedido")
-            .WithOpenApi()
+            .WithName("Actualizar Expedicion sin Pedido")
             .RequireAuthorization();
     }
 }

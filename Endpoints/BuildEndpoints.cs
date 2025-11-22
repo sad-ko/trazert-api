@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace Trazert_API.Endpoints;
 
-public static class Buildendpoints
+public static class BuildEndpoints
 {
     public static IServiceCollection AddEndpoints(this IServiceCollection services, Assembly assembly)
     {
