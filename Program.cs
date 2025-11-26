@@ -18,8 +18,8 @@ builder.Services.AddCors(options =>
         );
 });
 
-var cnstr = builder.Configuration.GetConnectionString("SQL") ?? throw new InvalidOperationException("Connection string 'SQL' not found.");
-builder.Services.AddDbContext<DatabaseContext>(opt => opt.UseSqlServer(cnstr));
+var connectionString = builder.Configuration.GetConnectionString("SQL") ?? throw new InvalidOperationException("Connection string 'SQL' not found.");
+builder.Services.AddDbContext<DatabaseContext>(opt => opt.UseSqlServer(connectionString));
 
 builder.Services.AddScoped<PasswordHasher>();
 builder.Services.AddScoped<TokenProvider>();
@@ -74,7 +74,13 @@ app.UseAuthorization(); //TODO!: Agregar Roles de Usuarios
 
 app.UseExceptionHandler(handler =>
 {
-    handler.Run(async context => await Results.Problem().ExecuteAsync(context));
+    handler
+        .Run(async context => await Results.Problem(
+            detail: "An internal server error occurred.",
+            statusCode: StatusCodes.Status500InternalServerError,
+            title: "Internal Server Error"
+        )
+        .ExecuteAsync(context));
 });
 
 app.MapEndpoints();

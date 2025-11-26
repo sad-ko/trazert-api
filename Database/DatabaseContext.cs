@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Trazert_API.Models;
+using Trazert_API.Database.Models;
 
 namespace Trazert_API.Database;
 
@@ -15,6 +15,7 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbCont
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("dbo");
+        
         modelBuilder.Entity<Usuario>(eb =>
         {
             eb.ToView("UsuariosActivos");

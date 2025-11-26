@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace Trazert_API.Models;
+namespace Trazert_API.Database.Models;
 
 [PrimaryKey(nameof(ExpedicionId))]
 public class Despacho
@@ -10,11 +11,13 @@ public class Despacho
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Column(Order = 1)]
     [JsonPropertyName("expedicion_id")]
-    public int ExpedicionId { get; set; }
+    public int ExpedicionId { get; init; }
 
     [JsonPropertyName("idCtaAuxi")]
-    public required string IdCtaAuxi { get; set; }
+    [StringLength(12)]
+    public required string IdCtaAuxi { get; init; }
 
     [JsonPropertyName("cliente")]
-    public required string Cliente { get; set; }
+    [StringLength(40)]
+    public required string Cliente { get; init; }
 }

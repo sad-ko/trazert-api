@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace Trazert_API.Models;
+namespace Trazert_API.Database.Models;
 
 [PrimaryKey(nameof(Id))]
 public class Usuario
@@ -11,16 +11,16 @@ public class Usuario
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Column(Order = 1)]
     [JsonPropertyName("id")]
-    public int Id { get; set; }
+    public int Id { get; init; }
 
     [JsonPropertyName("nombre")]
-    public required string Nombre { get; set; }
+    [StringLength(14)]
+    public required string Nombre { get; init; }
 
     [JsonPropertyName("fecha_baja")]
-    public DateTime? FechaBaja { get; set; }
-
-    [Column(TypeName = "char")]
-    [MaxLength(24)]
+    public DateTime? FechaBaja { get; init; }
+    
     [JsonIgnore]
-    public required string Hash { get; set; }
+    [StringLength(97)]
+    public required string Hash { get; init; }
 }

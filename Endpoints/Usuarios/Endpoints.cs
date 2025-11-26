@@ -6,16 +6,14 @@ using Trazert_API.Services;
 
 namespace Trazert_API.Endpoints.Usuarios;
 
-public class UsuariosEndpoints : IEndpoint
+public class Endpoints : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/usuarios")
             .WithTags("Usuarios");
         
-        group.MapGet("/hash", (PasswordHasher hasher, string password) => hasher.Hash(password));
-
-        group.MapGet("/usuarios", GetUsuarios);
+        group.MapGet("/", GetUsuarios);
         
         group.MapPost("/login", PostLogin);
     }
@@ -34,7 +32,7 @@ public class UsuariosEndpoints : IEndpoint
             return TypedResults.Unauthorized();
         }
 
-        var jwt = provider.Create(user).Result;
+        var jwt = provider.Create(user);
         http.Response.Cookies.Append("trazert_jwt", jwt, new CookieOptions
         {
             HttpOnly = true,

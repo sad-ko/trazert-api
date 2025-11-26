@@ -2,14 +2,13 @@
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
-using Trazert_API.Database;
-using Trazert_API.Models;
+using Trazert_API.Database.Models;
 
 namespace Trazert_API.Services;
 
-internal sealed class TokenProvider(IConfiguration configuration, DatabaseContext context)
+internal sealed class TokenProvider(IConfiguration configuration)
 {
-    public async Task<string> Create(Usuario user)
+    public string Create(Usuario user)
     {
         //var categoria = await context.Categoria.FirstAsync(cat => cat.Id == user.Categoria_Id);
 
