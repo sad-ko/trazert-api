@@ -41,6 +41,6 @@ public class Endpoints : IEndpoint
             Expires = DateTime.UtcNow.AddHours(1)
         });
 
-        return TypedResults.Ok();
+        return TypedResults.Ok(new GetUsuarioResponse(user.Id, user.Nombre));
     }
 }

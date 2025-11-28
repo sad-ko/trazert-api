@@ -55,11 +55,11 @@ public class Endpoints : IEndpoint
                 idOut
             );
 
-            return Results.Ok(new { id = (int)idOut.Value });
+            return TypedResults.Ok(new { id = (int)idOut.Value });
         }
         catch (SqlException ex)
         {
-            return Results.Conflict(new { message = ex.Message });
+            return TypedResults.Conflict(new { message = ex.Message });
         }
     }
 
@@ -85,11 +85,11 @@ public class Endpoints : IEndpoint
                 idOut
             );
 
-            return Results.Ok(new { id = (int)idOut.Value });
+            return TypedResults.Ok(new { id = (int)idOut.Value });
         }
         catch (SqlException ex)
         {
-            return Results.Conflict(new { message = ex.Message });
+            return TypedResults.Conflict(new { message = ex.Message });
         }
     }
 }

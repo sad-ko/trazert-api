@@ -17,13 +17,13 @@ public class Endpoints : IEndpoint
         group.MapGet("/{id:int}", async (DatabaseContext context, int id) =>
         {
             var codbar = await context.Database.SqlQuery<string>($"SELECT [dbo].[ObtenerCodBarPallet]({id})").ToArrayAsync();
-            return Results.Ok(codbar[0]);
+            return TypedResults.Ok(codbar[0]);
         });
         
         group.MapGet("/{codbar}", async (DatabaseContext context, string codbar) =>
         {
             var id = await context.Database.SqlQuery<int>($"SELECT [dbo].[ObtenerIdPallet]({codbar})").ToArrayAsync();
-            return Results.Ok(id[0]);
+            return TypedResults.Ok(id[0]);
         });
 
         group.MapPost("/crear", CreatePalet)
@@ -38,14 +38,14 @@ public class Endpoints : IEndpoint
         group.MapDelete("/{id:int}", DeletePalet)
             .RequireAuthorization();
 
-        group.MapPost("/{id:int}/add/{codbar}", AddToPalet)
+        group.MapPost("/{id:int}/add", AddToPalet)
             .RequireAuthorization();
         
-        group.MapPost("/{id:int}/remove/{codbar}", RemoveFromPalet)
+        group.MapPost("/{id:int}/remove", RemoveFromPalet)
             .RequireAuthorization();
     }
     
-    private static async Task<IResult> CreatePalet(ClaimsPrincipal user, DatabaseContext context, [FromBody] CreatePaletRequest req)
+    private static async Task<IResult> CreatePalet(ClaimsPrincipal user, DatabaseContext context, [FromBody] CreatePalletRequest req)
     {
         try
         {
@@ -64,15 +64,15 @@ public class Endpoints : IEndpoint
                 paletId
             );
             
-            return Results.Ok(new { id = (int)paletId.Value });
+            return TypedResults.Ok(new { id = (int)paletId.Value });
         }
         catch (SqlException ex)
         {
-            return Results.Conflict(new { message = ex.Message });
+            return TypedResults.Conflict(new { message = ex.Message });
         }
     }
 
-    private static async Task<IResult> ClosePalet(ClaimsPrincipal user, DatabaseContext context, [FromBody] ClosePaletRequest req)
+    private static async Task<IResult> ClosePalet(ClaimsPrincipal user, DatabaseContext context, [FromBody] ClosePalletRequest req)
     {
         try
         {
@@ -83,15 +83,15 @@ public class Endpoints : IEndpoint
                 new SqlParameter("@idUsuario", user.FindFirst("Sub")?.Value ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value)
             );
             
-            return Results.Ok();
+            return TypedResults.Ok();
         }
         catch (SqlException ex)
         {
-            return Results.Conflict(new { message = ex.Message });
+            return TypedResults.Conflict(new { message = ex.Message });
         }
     }
     
-    private static async Task<IResult> OpenPalet(ClaimsPrincipal user, DatabaseContext context, [FromBody] OpenPaletRequest req)
+    private static async Task<IResult> OpenPalet(ClaimsPrincipal user, DatabaseContext context, [FromBody] OpenPalletRequest req)
     {
         try
         {
@@ -100,11 +100,11 @@ public class Endpoints : IEndpoint
                 new SqlParameter("@idPallet", req.Id)
             );
             
-            return Results.Ok();
+            return TypedResults.Ok();
         }
         catch (SqlException ex)
         {
-            return Results.Conflict(new { message = ex.Message });
+            return TypedResults.Conflict(new { message = ex.Message });
         }
     }
     
@@ -119,15 +119,15 @@ public class Endpoints : IEndpoint
                 new SqlParameter("@idUsuario", user.FindFirst("Sub")?.Value ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value)
             );
             
-            return Results.Ok();
+            return TypedResults.Ok();
         }
         catch (SqlException ex)
         {
-            return Results.Conflict(new { message = ex.Message });
+            return TypedResults.Conflict(new { message = ex.Message });
         }
     }
     
-    private static async Task<IResult> AddToPalet(ClaimsPrincipal user, DatabaseContext context, int id, string codbar)
+    private static async Task<IResult> AddToPalet(ClaimsPrincipal user, DatabaseContext context, int id, [FromBody] PostPalletRequest req)
     {
         try
         {
@@ -135,20 +135,20 @@ public class Endpoints : IEndpoint
                 "EXEC [dbo].[PalletAgregarQuitar] @agregar, @idPallet, @codbar, @idPuesto, @idUsuario",
                 new SqlParameter("@agregar", true),
                 new SqlParameter("@idPallet", id),
-                new SqlParameter("@codbar", codbar),
+                new SqlParameter("@codbar", req.Codbar),
                 new SqlParameter("@idPuesto", 17),
                 new SqlParameter("@idUsuario", user.FindFirst("Sub")?.Value ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value)
             );
             
-            return Results.Ok();
+            return TypedResults.Ok();
         }
         catch (SqlException ex)
         {
-            return Results.Conflict(new { message = ex.Message });
+            return TypedResults.Conflict(new { message = ex.Message });
         }
     }
     
-    private static async Task<IResult> RemoveFromPalet(ClaimsPrincipal user, DatabaseContext context, int id, string codbar)
+    private static async Task<IResult> RemoveFromPalet(ClaimsPrincipal user, DatabaseContext context, int id, [FromBody] PostPalletRequest req)
     {
         try
         {
@@ -156,16 +156,16 @@ public class Endpoints : IEndpoint
                 "EXEC [dbo].[PalletAgregarQuitar] @agregar, @idPallet, @codbar, @idPuesto, @idUsuario",
                 new SqlParameter("@agregar", false),
                 new SqlParameter("@idPallet", id),
-                new SqlParameter("@codbar", codbar),
+                new SqlParameter("@codbar", req.Codbar),
                 new SqlParameter("@idPuesto", 17),
                 new SqlParameter("@idUsuario", user.FindFirst("Sub")?.Value ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value)
             );
             
-            return Results.Ok();
+            return TypedResults.Ok();
         }
         catch (SqlException ex)
         {
-            return Results.Conflict(new { message = ex.Message });
+            return TypedResults.Conflict(new { message = ex.Message });
         }
     }
     
