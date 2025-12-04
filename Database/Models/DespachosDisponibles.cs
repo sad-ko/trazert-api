@@ -10,8 +10,11 @@ public class Despacho
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Column(Order = 1)]
-    [JsonPropertyName("expedicion_id")]
+    [JsonPropertyName("id")]
     public int ExpedicionId { get; init; }
+    
+    [JsonPropertyName("idAuxi")]
+    public required short IdAuxi { get; init; }
 
     [JsonPropertyName("idCtaAuxi")]
     [StringLength(12)]
