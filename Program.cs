@@ -10,8 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
+    var route = builder.Configuration.GetSection("Route").Value;
     options.AddPolicy("AllowAll",
-        policy => policy.SetIsOriginAllowed(_ => true)
+        policy => policy.WithOrigins(route ?? "*")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials()

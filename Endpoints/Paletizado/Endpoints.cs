@@ -13,6 +13,8 @@ public class Endpoints : IEndpoint
     {
         var group = app.MapGroup("/paletizado")
             .WithTags("Paletizado");
+        
+        group.MapGet("/", async (DatabaseContext context) => await context.ListarPallets.ToArrayAsync());
 
         group.MapGet("/{id:int}", async (DatabaseContext context, int id) =>
         {

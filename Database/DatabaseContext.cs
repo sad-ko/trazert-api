@@ -11,6 +11,7 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbCont
     public DbSet<CargaDetalles> CargaDetalles { get; set; }
     public DbSet<Cliente> Clientes { get; set; }
     public DbSet<Despacho> DespachosDisponibles { get; set; }
+    public DbSet<ListarPallets> ListarPallets { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -42,6 +43,11 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbCont
         {
             eb.HasNoKey();
             eb.ToView("Clientes");
+        });
+        modelBuilder.Entity<ListarPallets>(eb =>
+        {
+            eb.HasNoKey();
+            eb.ToView("ListarPallets");
         });
     }
 }
