@@ -78,7 +78,7 @@ public class Endpoints : IEndpoint
                 "EXEC [dbo].[ActualizarExpedicionSinPedido] @agregar, @expedicion_id, @idAuxi, @idCtaAuxi, @codbar, @puesto, @usuario, @id OUT",
                 new SqlParameter("@agregar", req.Agregar),
                 new SqlParameter("@expedicion_id", req.Expedicion ?? (object)DBNull.Value),
-                new SqlParameter("@@idAuxi", req.IdAuxi),
+                new SqlParameter("@idAuxi", req.IdAuxi),
                 new SqlParameter("@idCtaAuxi", req.CtaAuxi),
                 new SqlParameter("@codbar", req.Codbar),
                 new SqlParameter("@puesto", 17),

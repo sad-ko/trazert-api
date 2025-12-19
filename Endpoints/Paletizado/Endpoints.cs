@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Security.Claims;
 using Trazert_API.Database;
 using Trazert_API.Endpoints.Paletizado.DTOs;
@@ -13,16 +14,21 @@ public class Endpoints : IEndpoint
     {
         var group = app.MapGroup("/paletizado")
             .WithTags("Paletizado");
-        
+
         group.MapGet("/", async (DatabaseContext context) => await context.ListarPallets.ToArrayAsync());
 
-        group.MapGet("/{id:int}", async (DatabaseContext context, int id) =>
+        group.MapGet("/{id:int}", async (DatabaseContext context, int id) => await context.ListarPallets.FirstOrDefaultAsync(p => p.Id == id));
+
+        group.MapGet("/detalles/{id:int}", async (DatabaseContext context, int id) =>
+            await context.PalletDetalles.Where(p => p.PalletId == id).ToArrayAsync());
+
+        group.MapGet("/codbar/{id:int}", async (DatabaseContext context, int id) =>
         {
             var codbar = await context.Database.SqlQuery<string>($"SELECT [dbo].[ObtenerCodBarPallet]({id})").ToArrayAsync();
             return TypedResults.Ok(codbar[0]);
         });
-        
-        group.MapGet("/{codbar}", async (DatabaseContext context, string codbar) =>
+
+        group.MapGet("/codbar/{codbar}", async (DatabaseContext context, string codbar) =>
         {
             var id = await context.Database.SqlQuery<int>($"SELECT [dbo].[ObtenerIdPallet]({codbar})").ToArrayAsync();
             return TypedResults.Ok(id[0]);
@@ -34,19 +40,19 @@ public class Endpoints : IEndpoint
         group.MapPost("/cerrar", ClosePalet)
             .RequireAuthorization();
 
-        group.MapPost("/reabrir", OpenPalet)
+        group.MapPost("/abrir", OpenPalet)
             .RequireAuthorization();
-        
+
         group.MapDelete("/{id:int}", DeletePalet)
             .RequireAuthorization();
 
         group.MapPost("/{id:int}/add", AddToPalet)
             .RequireAuthorization();
-        
+
         group.MapPost("/{id:int}/remove", RemoveFromPalet)
             .RequireAuthorization();
     }
-    
+
     private static async Task<IResult> CreatePalet(ClaimsPrincipal user, DatabaseContext context, [FromBody] CreatePalletRequest req)
     {
         try
@@ -54,8 +60,8 @@ public class Endpoints : IEndpoint
             var paletId = new SqlParameter
             {
                 ParameterName = "@Retorno",
-                SqlDbType = System.Data.SqlDbType.Int,
-                Direction = System.Data.ParameterDirection.Output
+                SqlDbType = SqlDbType.Int,
+                Direction = ParameterDirection.Output
             };
 
             await context.Database.ExecuteSqlRawAsync(
@@ -65,7 +71,7 @@ public class Endpoints : IEndpoint
                 new SqlParameter("@idUsuario", user.FindFirst(ClaimTypes.NameIdentifier)?.Value),
                 paletId
             );
-            
+
             return TypedResults.Ok(new { id = (int)paletId.Value });
         }
         catch (SqlException ex)
@@ -84,7 +90,7 @@ public class Endpoints : IEndpoint
                 new SqlParameter("@idPuesto", 17),
                 new SqlParameter("@idUsuario", user.FindFirst("Sub")?.Value ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value)
             );
-            
+
             return TypedResults.Ok();
         }
         catch (SqlException ex)
@@ -92,7 +98,7 @@ public class Endpoints : IEndpoint
             return TypedResults.Conflict(new { message = ex.Message });
         }
     }
-    
+
     private static async Task<IResult> OpenPalet(ClaimsPrincipal user, DatabaseContext context, [FromBody] OpenPalletRequest req)
     {
         try
@@ -101,7 +107,7 @@ public class Endpoints : IEndpoint
                 "EXEC [dbo].[PalletReAbrir] @idPallet",
                 new SqlParameter("@idPallet", req.Id)
             );
-            
+
             return TypedResults.Ok();
         }
         catch (SqlException ex)
@@ -109,7 +115,7 @@ public class Endpoints : IEndpoint
             return TypedResults.Conflict(new { message = ex.Message });
         }
     }
-    
+
     private static async Task<IResult> DeletePalet(ClaimsPrincipal user, DatabaseContext context, int id)
     {
         try
@@ -120,7 +126,7 @@ public class Endpoints : IEndpoint
                 new SqlParameter("@idPuesto", 17),
                 new SqlParameter("@idUsuario", user.FindFirst("Sub")?.Value ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value)
             );
-            
+
             return TypedResults.Ok();
         }
         catch (SqlException ex)
@@ -128,7 +134,7 @@ public class Endpoints : IEndpoint
             return TypedResults.Conflict(new { message = ex.Message });
         }
     }
-    
+
     private static async Task<IResult> AddToPalet(ClaimsPrincipal user, DatabaseContext context, int id, [FromBody] PostPalletRequest req)
     {
         try
@@ -141,7 +147,7 @@ public class Endpoints : IEndpoint
                 new SqlParameter("@idPuesto", 17),
                 new SqlParameter("@idUsuario", user.FindFirst("Sub")?.Value ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value)
             );
-            
+
             return TypedResults.Ok();
         }
         catch (SqlException ex)
@@ -149,7 +155,7 @@ public class Endpoints : IEndpoint
             return TypedResults.Conflict(new { message = ex.Message });
         }
     }
-    
+
     private static async Task<IResult> RemoveFromPalet(ClaimsPrincipal user, DatabaseContext context, int id, [FromBody] PostPalletRequest req)
     {
         try
@@ -162,7 +168,7 @@ public class Endpoints : IEndpoint
                 new SqlParameter("@idPuesto", 17),
                 new SqlParameter("@idUsuario", user.FindFirst("Sub")?.Value ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value)
             );
-            
+
             return TypedResults.Ok();
         }
         catch (SqlException ex)
@@ -170,5 +176,4 @@ public class Endpoints : IEndpoint
             return TypedResults.Conflict(new { message = ex.Message });
         }
     }
-    
 }

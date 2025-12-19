@@ -12,11 +12,12 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbCont
     public DbSet<Cliente> Clientes { get; set; }
     public DbSet<Despacho> DespachosDisponibles { get; set; }
     public DbSet<ListarPallets> ListarPallets { get; set; }
+    public DbSet<PalletDetalles> PalletDetalles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("dbo");
-        
+
         modelBuilder.Entity<Usuario>(eb =>
         {
             eb.ToView("UsuariosActivos");
@@ -48,6 +49,11 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbCont
         {
             eb.HasNoKey();
             eb.ToView("ListarPallets");
+        });
+        modelBuilder.Entity<PalletDetalles>(eb =>
+        {
+            eb.HasNoKey();
+            eb.ToView("PalletDetalles");
         });
     }
 }
