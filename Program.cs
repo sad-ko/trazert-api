@@ -12,11 +12,13 @@ builder.Services.AddCors(options =>
 {
     var route = builder.Configuration.GetSection("Route").Value;
     options.AddPolicy("AllowAll",
-        policy => policy.WithOrigins(route ?? "*")
+        policy => policy
+            //.WithOrigins(route ?? "*")
+            .SetIsOriginAllowed(_ => true)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials()
-        );
+    );
 });
 
 var connectionString = builder.Configuration.GetConnectionString("SQL") ?? throw new InvalidOperationException("Connection string 'SQL' not found.");
@@ -80,11 +82,11 @@ app.UseExceptionHandler(handler =>
 {
     handler
         .Run(async context => await Results.Problem(
-            detail: "An internal server error occurred.",
-            statusCode: StatusCodes.Status500InternalServerError,
-            title: "Internal Server Error"
-        )
-        .ExecuteAsync(context));
+                "An internal server error occurred.",
+                statusCode: StatusCodes.Status500InternalServerError,
+                title: "Internal Server Error"
+            )
+            .ExecuteAsync(context));
 });
 
 app.Use(async (context, next) =>
@@ -98,11 +100,11 @@ app.Use(async (context, next) =>
         await context.Response.WriteAsJsonAsync(new { message = "Token revoked" });
         return;
     }
-    
+
     await next();
 });
 
 app.MapEndpoints();
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 await app.RunAsync();

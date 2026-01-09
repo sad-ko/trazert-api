@@ -13,11 +13,11 @@ public class Endpoints : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/usuarios")
+        var group = app.MapGroup("/api/usuarios")
             .WithTags("Usuarios");
-        
+
         group.MapGet("/", GetUsuarios);
-        
+
         group.MapPost("/login", PostLogin);
 
         group.MapPost("/logout", PostLogout)
@@ -33,7 +33,8 @@ public class Endpoints : IEndpoint
         return await context.UsuariosActivos.Select(u => new GetUsuarioResponse(u.Id, u.Nombre)).ToArrayAsync();
     }
 
-    private static async Task<IResult> PostLogin(IOptions<JwtSettings> config, HttpContext http, DatabaseContext context, PasswordHasher hasher, TokenProvider provider, [FromBody] PostLoginRequest request)
+    private static async Task<IResult> PostLogin(IOptions<JwtSettings> config, HttpContext http, DatabaseContext context, PasswordHasher hasher,
+        TokenProvider provider, [FromBody] PostLoginRequest request)
     {
         var user = await context.UsuariosActivos.FirstOrDefaultAsync(u => u.Nombre == request.Nombre);
 
@@ -47,8 +48,9 @@ public class Endpoints : IEndpoint
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.None,
-            Expires = DateTime.UtcNow.AddHours(config.Value.ExpiryInMinutes)
+            SameSite = SameSiteMode.Lax,
+            Expires = DateTime.UtcNow.AddHours(config.Value.ExpiryInMinutes),
+            Path = "/"
         });
 
         return TypedResults.Ok(new GetUsuarioResponse(user.Id, user.Nombre));
@@ -57,17 +59,19 @@ public class Endpoints : IEndpoint
     private static IResult PostLogout(HttpContext context, TokenBlackList blackList)
     {
         var token = context.Request.Cookies[Constants.Token];
-        
+
         if (string.IsNullOrEmpty(token))
+        {
             return TypedResults.Unauthorized();
+        }
 
         var handler = new JwtSecurityTokenHandler();
         var jwtToken = handler.ReadJwtToken(token);
-        
+
         blackList.Add(token, jwtToken.ValidTo);
-        
+
         context.Response.Cookies.Delete(Constants.Token);
-        
+
         return TypedResults.Ok(new { message = "Logged out successfully" });
     }
 
@@ -76,12 +80,12 @@ public class Endpoints : IEndpoint
         var claimId = claims.FindFirst("Sub")?.Value ?? claims.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var userId = int.Parse(claimId ?? "0");
         var user = await context.UsuariosActivos.FirstOrDefaultAsync(u => u.Id == userId);
-        
+
         if (user is null)
         {
             return TypedResults.Unauthorized();
         }
-        
+
         return TypedResults.Ok(new GetUsuarioResponse(user.Id, user.Nombre));
     }
 }

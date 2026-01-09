@@ -13,6 +13,8 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbCont
     public DbSet<Despacho> DespachosDisponibles { get; set; }
     public DbSet<ListarPallets> ListarPallets { get; set; }
     public DbSet<PalletDetalles> PalletDetalles { get; set; }
+    public DbSet<HistorialExpediciones> HistorialExpediciones { get; set; }
+    public DbSet<DespachoDetalles> DespachoDetalles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -54,6 +56,16 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbCont
         {
             eb.HasNoKey();
             eb.ToView("PalletDetalles");
+        });
+        modelBuilder.Entity<HistorialExpediciones>(eb =>
+        {
+            eb.HasNoKey();
+            eb.ToView("report_HistorialExpediciones");
+        });
+        modelBuilder.Entity<DespachoDetalles>(eb =>
+        {
+            eb.HasNoKey();
+            eb.ToView("report_DespachoDetalles");
         });
     }
 }

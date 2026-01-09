@@ -12,7 +12,7 @@ public class Endpoints : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/paletizado")
+        var group = app.MapGroup("/api/paletizado")
             .WithTags("Paletizado");
 
         group.MapGet("/", async (DatabaseContext context) => await context.ListarPallets.ToArrayAsync());
